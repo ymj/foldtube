@@ -13,10 +13,40 @@
       <h1>FoldTube</h1>
     </div>
     <div class="header-controls">
-      <span class="video-count">0 videos</span>
-      <!-- Phase 1: Search and Filter UI is omitted -->
+      <span class="video-count">0 items</span>
     </div>
   </header>
+
+  <div id="selection-bar" class="selection-bar hidden">
+    <span id="selection-count">1 selected</span>
+    <div class="selection-actions">
+      <button id="btn-select-all">Select All</button>
+      <button id="btn-deselect-all">Deselect All</button>
+      <button id="btn-open-selected">Open Selected</button>
+      <button id="btn-delete-selected">Delete Selected</button>
+    </div>
+  </div>
+
+  <div class="controls-bar">
+    <input type="search" id="search-input" placeholder="Search saved videos..." />
+    <select id="sort-select">
+      <option value="date-desc">Date Saved — Newest first</option>
+      <option value="date-asc">Date Saved — Oldest first</option>
+      <option value="dur-asc">Duration — Shortest first</option>
+      <option value="dur-desc">Duration — Longest first</option>
+      <option value="chan-asc">Channel Name — A → Z</option>
+      <option value="chan-desc">Channel Name — Z → A</option>
+      <option value="title-asc">Title — A → Z</option>
+    </select>
+    <div class="duration-filters" id="duration-filters">
+      <button class="filter-pill active" data-all="true">All</button>
+      <button class="filter-pill" data-min="0" data-max="300">Under 5 min</button>
+      <button class="filter-pill" data-min="300" data-max="900">5–15 min</button>
+      <button class="filter-pill" data-min="900" data-max="1800">15–30 min</button>
+      <button class="filter-pill" data-min="1800" data-max="3600">30–60 min</button>
+      <button class="filter-pill" data-min="3600" data-max="999999">Over 60 min</button>
+    </div>
+  </div>
 
   <main class="main-content">
     <div id="empty-state" class="empty-state hidden">

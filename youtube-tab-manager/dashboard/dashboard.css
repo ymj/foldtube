@@ -243,3 +243,115 @@ body {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* Controls Bar */
+.controls-bar {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 24px 0;
+  max-width: 1400px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+#search-input,
+#sort-select {
+  padding: 8px 12px;
+  border-radius: var(--border-radius);
+  border: 1px solid #444;
+  background-color: var(--surface-color);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+#search-input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.duration-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-pill {
+  padding: 6px 14px;
+  border-radius: 16px;
+  border: 1px solid #444;
+  background-color: transparent;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+}
+
+.filter-pill:hover {
+  background-color: var(--surface-hover);
+}
+
+.filter-pill.active {
+  background-color: var(--text-primary);
+  color: var(--bg-color);
+  border-color: var(--text-primary);
+}
+
+/* Selection Bar */
+.selection-bar {
+  position: sticky;
+  top: 61px;
+  left: 0;
+  right: 0;
+  background-color: var(--accent-color);
+  color: white;
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 99;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.selection-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.selection-actions button {
+  background-color: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color var(--transition-speed);
+}
+
+.selection-actions button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Checkboxes */
+.card-checkbox {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 20px;
+  height: 20px;
+  z-index: 10;
+  opacity: 0;
+  cursor: pointer;
+  accent-color: var(--accent-color);
+}
+
+.video-card:hover .card-checkbox,
+.card-checkbox:checked {
+  opacity: 1;
+}
+
+.video-card.selected {
+  outline: 2px solid var(--accent-color);
+}

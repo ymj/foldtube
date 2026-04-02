@@ -1,5 +1,6 @@
 export function scrapeYouTubeTab() {
   const isShort = window.location.pathname.startsWith('/shorts/');
+  const isLive = window.location.pathname.startsWith('/live/');
   let videoId = null;
   let videoType = 'video';
 
@@ -7,6 +8,9 @@ export function scrapeYouTubeTab() {
     const parts = window.location.pathname.split('/');
     videoId = parts[parts.length - 1];
     videoType = 'short';
+  } else if (isLive) {
+    const parts = window.location.pathname.split('/');
+    videoId = parts[parts.length - 1];
   } else {
     const videoIdMatch = window.location.search.match(/[?&]v=([^&]+)/);
     videoId = videoIdMatch ? videoIdMatch[1] : null;
