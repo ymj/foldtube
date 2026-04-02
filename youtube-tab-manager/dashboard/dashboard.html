@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>FoldTube - Youtube Tab Manager Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+
+<body>
+  <header class="header">
+    <div class="logo">
+      <h1>FoldTube</h1>
+    </div>
+    <div class="header-controls">
+      <span class="video-count">0 videos</span>
+      <!-- Phase 1: Search and Filter UI is omitted -->
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div id="empty-state" class="empty-state hidden">
+      <p>No saved videos yet. Click the extension icon to collect your open YouTube tabs.</p>
+    </div>
+    
+    <div id="videos-section" class="section hidden">
+      <h2 class="section-title">Videos</h2>
+      <div id="video-grid" class="video-grid"></div>
+    </div>
+
+    <div id="shorts-section" class="section hidden">
+      <h2 class="section-title">Shorts</h2>
+      <div id="shorts-grid" class="video-grid shorts-grid"></div>
+    </div>
+  </main>
+
+  <script src="dashboard.js"></script>
+</body>
+
+</html>

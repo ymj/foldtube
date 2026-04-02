@@ -1,0 +1,245 @@
+:root {
+  --bg-color: #0f0f0f;
+  --surface-color: #212121;
+  --surface-hover: #3d3d3d;
+  --text-primary: #f1f1f1;
+  --text-secondary: #aaaaaa;
+  --accent-color: #ff0000;
+  --border-radius: 8px;
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --transition-speed: 0.2s;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background-color: var(--surface-color);
+  border-bottom: 1px solid #333;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.video-count {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.main-content {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 64px 20px;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.video-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 1400px) {
+  .video-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .video-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .video-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Video Card */
+.video-card {
+  background-color: var(--surface-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  position: relative;
+  transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+  cursor: pointer;
+  animation: cardFadeIn 0.4s ease forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.video-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  background-color: var(--surface-hover);
+}
+
+@keyframes cardFadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.thumbnail-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.duration-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.card-content {
+  padding: 12px;
+  position: relative;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 24px;
+}
+
+.channel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.channel:hover {
+  color: var(--text-primary);
+}
+
+.date-saved {
+  font-size: 0.75rem;
+  color: #777;
+}
+
+.delete-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-speed), background-color var(--transition-speed);
+}
+
+.delete-btn:hover {
+  color: var(--accent-color);
+  background-color: rgba(255, 0, 0, 0.1);
+}
+
+.card-exit {
+  animation: cardFadeOut 0.3s ease forwards;
+}
+
+@keyframes cardFadeOut {
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+/* Sections */
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 32px 0 16px;
+  color: var(--text-primary);
+  border-bottom: 1px solid #333;
+  padding-bottom: 8px;
+}
+
+.section.hidden {
+  display: none !important;
+}
+
+/* Shorts Grid specific */
+.shorts-grid {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.shorts-grid .thumbnail-container {
+  aspect-ratio: 9 / 16;
+}
+
+@media (max-width: 1400px) {
+  .shorts-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .shorts-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .shorts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
