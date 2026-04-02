@@ -9,13 +9,22 @@
 
 <body>
   <header class="header">
-    <div class="logo">
-      <h1>FoldTube</h1>
+    <div class="logo" style="display: flex; align-items: center; gap: 12px;">
+      <img src="../icons/icon128.png" alt="FoldTube Icon" style="width: 28px; height: 28px; object-fit: contain;">
+      <h1 style="margin: 0;">FoldTube</h1>
     </div>
-    <div class="header-controls">
+    <div class="header-controls" style="display: flex; align-items: center;">
       <span class="video-count">0 items</span>
+      <button id="btn-settings" class="settings-btn" title="Settings">⚙️</button>
     </div>
   </header>
+
+  <div id="api-error-banner" class="api-banner hidden">
+    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 1400px; margin: 0 auto;">
+      <span>⚠️ There seems to be an issue validating your YouTube API Key. Please check your settings and enter a valid one.</span>
+      <button id="btn-dismiss-banner" class="close-btn" style="font-size: 1.2rem; padding: 0;">&times;</button>
+    </div>
+  </div>
 
   <div id="selection-bar" class="selection-bar hidden">
     <span id="selection-count">1 selected</span>
@@ -63,6 +72,56 @@
       <div id="shorts-grid" class="video-grid shorts-grid"></div>
     </div>
   </main>
+
+  <dialog id="settings-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Settings</h2>
+        <button id="btn-close-settings" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        
+        <div class="setting-group">
+          <h3>General</h3>
+          <div class="setting-item toggle-item">
+            <div class="setting-text">
+              <label for="auto-collapse-toggle">Auto-Collapse YouTube Tabs on Exit</label>
+              <p>Automatically save your open YouTube tabs into FoldTube when closing the browser window.</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="auto-collapse-toggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <h3>API & Enrichment</h3>
+          <div class="setting-item">
+            <label for="api-key-input">Enable Data Enrichment</label>
+            <p>Link a YouTube Data API v3 key to magically backfill missing channel names and correct video durations for sleeping/auto-collapsed tabs.</p>
+            <input type="password" id="api-key-input" placeholder="Paste YouTube Data API Key here...">
+            <div style="display: flex; gap: 8px;">
+              <button id="btn-save-api" class="btn-primary">Save Key</button>
+              <button id="btn-clear-api" class="btn-secondary hidden" title="Remove the current API key">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <h3>Data Manager</h3>
+          <p>Create a localized backup of your Foldtube dashboard or restore an older save state.</p>
+          <div class="setting-actions">
+            <button id="btn-export" class="btn-secondary">Export to JSON</button>
+            <button id="btn-export-html" class="btn-secondary">Export to HTML</button>
+            <button id="btn-import-trigger" class="btn-secondary">Import from JSON</button>
+            <input type="file" id="import-file" accept=".json" class="hidden">
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </dialog>
 
   <script src="dashboard.js"></script>
 </body>

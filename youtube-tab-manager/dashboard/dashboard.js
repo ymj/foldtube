@@ -2,30 +2,159 @@ let allVideos = [];
 let selectedVideoIds = new Set();
 let searchQuery = "";
 let currentSort = "date-desc";
-let currentDurationFilter = null; // { min: number, max: number }
+let currentDurationFilter = null;
+
+let appSettings = {
+  autoCollapse: false,
+  apiKey: ''
+};
 
 document.addEventListener('DOMContentLoaded', () => {
   init();
 });
 
+async function loadSettings() {
+  const { settings } = await chrome.storage.local.get("settings");
+  if (settings) {
+    appSettings = { ...appSettings, ...settings };
+  }
+  document.getElementById('auto-collapse-toggle').checked = appSettings.autoCollapse;
+  document.getElementById('api-key-input').value = appSettings.apiKey;
+  
+  if (appSettings.apiKey) {
+    document.getElementById('btn-clear-api').classList.remove('hidden');
+  } else {
+    document.getElementById('btn-clear-api').classList.add('hidden');
+  }
+}
+
+async function saveSettings() {
+  await chrome.storage.local.set({ settings: appSettings });
+  if (appSettings.apiKey) {
+    document.getElementById('btn-clear-api').classList.remove('hidden');
+  } else {
+    document.getElementById('btn-clear-api').classList.add('hidden');
+  }
+}
+
 async function init() {
+  await loadSettings();
   bindControls();
   await loadVideos();
 
+  // Load API error state initially
+  chrome.storage.local.get("apiError").then(({apiError}) => {
+    if (apiError) document.getElementById('api-error-banner').classList.remove('hidden');
+  });
+
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === "local" && changes.savedVideos) {
-      allVideos = changes.savedVideos.newValue || [];
-      // To prevent deselecting if they delete one, clean up selected:
-      const currentIds = new Set(allVideos.map(v => v.videoId));
-      for (const id of selectedVideoIds) {
-        if (!currentIds.has(id)) selectedVideoIds.delete(id);
+    if (area === "local") {
+      if (changes.savedVideos) {
+        allVideos = changes.savedVideos.newValue || [];
+        const currentIds = new Set(allVideos.map(v => v.videoId));
+        for (const id of selectedVideoIds) {
+          if (!currentIds.has(id)) selectedVideoIds.delete(id);
+        }
+        processAndRender();
       }
-      processAndRender();
+      if (changes.apiError) {
+        const banner = document.getElementById('api-error-banner');
+        if (changes.apiError.newValue) banner.classList.remove('hidden');
+        else banner.classList.add('hidden');
+      }
     }
   });
 }
 
 function bindControls() {
+  const settingsModal = document.getElementById('settings-modal');
+  
+  document.getElementById('btn-settings').addEventListener('click', () => { settingsModal.showModal(); });
+  document.getElementById('btn-close-settings').addEventListener('click', () => { settingsModal.close(); });
+  document.getElementById('btn-dismiss-banner').addEventListener('click', async () => {
+    document.getElementById('api-error-banner').classList.add('hidden');
+    await chrome.storage.local.set({ apiError: false });
+  });
+
+  document.getElementById('auto-collapse-toggle').addEventListener('change', async (e) => {
+    appSettings.autoCollapse = e.target.checked;
+    await saveSettings();
+  });
+
+  document.getElementById('btn-save-api').addEventListener('click', async () => {
+    appSettings.apiKey = document.getElementById('api-key-input').value.trim();
+    await saveSettings();
+    document.getElementById('btn-save-api').textContent = "Saved!";
+    setTimeout(() => { document.getElementById('btn-save-api').textContent = "Save Key"; }, 2000);
+    // Clear old errors and trigger enrichment
+    await chrome.storage.local.set({ apiError: false });
+    chrome.runtime.sendMessage({ action: "runEnrichment" });
+  });
+
+  document.getElementById('btn-clear-api').addEventListener('click', async () => {
+    appSettings.apiKey = '';
+    document.getElementById('api-key-input').value = '';
+    await saveSettings();
+    await chrome.storage.local.set({ apiError: false });
+  });
+
+  document.getElementById('btn-export').addEventListener('click', () => {
+    const dataStr = JSON.stringify(allVideos, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `foldtube_backup_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('btn-export-html').addEventListener('click', () => {
+    let htmlContent = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>FoldTube Backup</title>
+    <style>body{font-family:sans-serif; background:#0f0f0f; color:#fff; padding:2rem; max-width:800px; margin:0 auto;} a{color:#3ea6ff; text-decoration:none;} a:hover{text-decoration:underline;} li{margin:10px 0;} span{color:#aaa; font-size:0.9em;}</style>
+    </head><body><h1>FoldTube Tabs Backup</h1><ul>`;
+    
+    allVideos.forEach(v => {
+      htmlContent += `<li><a href="${v.url}" target="_blank">${escapeHtml(v.title)}</a> <span>— ${escapeHtml(v.channelName)} (${v.durationFormatted || 'live'})</span></li>`;
+    });
+    
+    htmlContent += `</ul></body></html>`;
+    const blob = new Blob([htmlContent], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `foldtube_bookmarks_${new Date().toISOString().split('T')[0]}.html`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('btn-import-trigger').addEventListener('click', () => {
+    document.getElementById('import-file').click();
+  });
+
+  document.getElementById('import-file').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      try {
+        const importedData = JSON.parse(evt.target.result);
+        if (!Array.isArray(importedData)) throw new Error("Invalid format");
+        
+        const savedIds = new Set(allVideos.map(v => v.videoId));
+        const newItems = importedData.filter(v => v.videoId && !savedIds.has(v.videoId));
+        
+        const merged = [...newItems, ...allVideos];
+        await chrome.storage.local.set({ savedVideos: merged });
+        alert(`Successfully imported ${newItems.length} new videos!`);
+      } catch (err) {
+        alert("Failed to parse the JSON file.");
+      }
+      e.target.value = '';
+    };
+    reader.readAsText(file);
+  });
+
   document.getElementById('search-input').addEventListener('input', (e) => {
     searchQuery = e.target.value.toLowerCase();
     processAndRender();
@@ -58,7 +187,6 @@ function bindControls() {
     }
   });
 
-  // Bulk Actions
   document.getElementById('btn-select-all').addEventListener('click', () => {
     const visibleVideos = getProcessedVideos();
     visibleVideos.forEach(v => selectedVideoIds.add(v.videoId));
@@ -80,11 +208,9 @@ function bindControls() {
       if (!confirm(`This will open ${selectedVideoIds.size} tabs. Continue?`)) return;
     }
     const ids = Array.from(selectedVideoIds);
-    // Find urls
     const urlsToOpen = allVideos.filter(v => ids.includes(v.videoId)).map(v => v.url);
     urlsToOpen.forEach(url => chrome.tabs.create({ url, active: false }));
     
-    // Delete from storage
     const newVideos = allVideos.filter(v => !selectedVideoIds.has(v.videoId));
     selectedVideoIds.clear();
     updateSelectionBar();
@@ -123,7 +249,6 @@ async function loadVideos() {
 function getProcessedVideos() {
   let processed = [...allVideos];
 
-  // 1. Search
   if (searchQuery) {
     processed = processed.filter(v => 
       (v.title && v.title.toLowerCase().includes(searchQuery)) ||
@@ -132,7 +257,6 @@ function getProcessedVideos() {
     );
   }
 
-  // 2. Filter Duration
   if (currentDurationFilter) {
     processed = processed.filter(v => {
       const ds = v.durationSeconds || 0;
@@ -140,7 +264,6 @@ function getProcessedVideos() {
     });
   }
 
-  // 3. Sort
   processed.sort((a, b) => {
     switch (currentSort) {
       case 'date-desc': return new Date(b.dateSaved) - new Date(a.dateSaved);

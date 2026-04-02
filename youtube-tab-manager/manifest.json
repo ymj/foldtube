@@ -10,7 +10,8 @@
     "notifications"
   ],
   "host_permissions": [
-    "*://*.youtube.com/*"
+    "*://*.youtube.com/*",
+    "*://*.googleapis.com/*"
   ],
   "background": {
     "service_worker": "background/service-worker.js",
