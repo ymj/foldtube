@@ -104,7 +104,7 @@ async function handleCollapse() {
 
     chrome.notifications.create({
       type: "basic",
-      iconUrl: "../icons/icon128.png",
+      iconUrl: chrome.runtime.getURL("icons/icon128.png"),
       title: "FoldTube",
       message: `Folded ${tabs.length} YouTube tab${tabs.length === 1 ? '' : 's'}!`,
       silent: true
@@ -116,7 +116,7 @@ async function handleCollapse() {
   } else {
     chrome.notifications.create({
       type: "basic",
-      iconUrl: "../icons/icon128.png",
+      iconUrl: chrome.runtime.getURL("icons/icon128.png"),
       title: "FoldTube",
       message: "No YouTube tabs found.",
       silent: true
@@ -126,16 +126,15 @@ async function handleCollapse() {
   const dashboardUrl = chrome.runtime.getURL("dashboard/dashboard.html");
   const dashboardTabs = await chrome.tabs.query({ url: dashboardUrl });
   if (dashboardTabs.length > 0) {
-    await chrome.tabs.update(dashboardTabs[0].id, { active: true });
+    const existingTab = dashboardTabs[0];
+    await chrome.tabs.update(existingTab.id, { active: true });
+    await chrome.windows.update(existingTab.windowId, { focused: true });
   } else {
     await chrome.tabs.create({ url: dashboardUrl });
   }
 }
 
 chrome.action.onClicked.addListener(handleCollapse);
-chrome.commands.onCommand.addListener((command) => {
-  if (command === "_execute_action") handleCollapse();
-});
 
 // ---- Utility functions ----
 
@@ -191,15 +190,22 @@ async function reconcileTabs() {
   const physicalTabs = await chrome.tabs.query({ url: ["*://*.youtube.com/watch?v=*", "*://*.youtube.com/shorts/*", "*://*.youtube.com/live/*"] });
   if (physicalTabs.length === 0) return;
 
-  const physicalUrls = new Set(physicalTabs.map(t => {
-    // Normalize url for strict matching, strip out timestamps if needed, or exact match.
-    // Exact match is safer.
-    return t.url;
-  }));
+  // Extract video IDs from restored tabs for robust matching regardless of
+  // extra query params (timestamps, playlist refs, etc.) that may differ.
+  const physicalVideoIds = new Set(physicalTabs.map(t => {
+    try {
+      const u = new URL(t.url);
+      if (u.pathname.startsWith('/shorts/') || u.pathname.startsWith('/live/')) {
+        const parts = u.pathname.split('/');
+        return parts[parts.length - 1] || null;
+      }
+      return u.searchParams.get('v');
+    } catch { return null; }
+  }).filter(Boolean));
 
   const cleansedVideos = savedVideos.filter(video => {
     // If it was auto-collapsed, and the browser cleanly restored it, delete it.
-    if (video.metadataSource === "auto-collapsed" && physicalUrls.has(video.url)) {
+    if (video.metadataSource === "auto-collapsed" && physicalVideoIds.has(video.videoId)) {
       return false; // Remove!
     }
     return true; // Keep!

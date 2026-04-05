@@ -203,8 +203,16 @@ function bindControls() {
       try {
         const imported = JSON.parse(evt.target.result);
         if (!Array.isArray(imported)) throw new Error("Invalid format");
+        const validItems = imported.filter(v =>
+          v && typeof v === 'object' &&
+          typeof v.videoId === 'string' && v.videoId &&
+          typeof v.url === 'string' && v.url &&
+          typeof v.title === 'string' &&
+          ['video', 'short'].includes(v.videoType)
+        );
+        if (validItems.length === 0 && imported.length > 0) throw new Error("No valid entries");
         const savedIds = new Set(allVideos.map(v => v.videoId));
-        const newItems = imported.filter(v => v.videoId && !savedIds.has(v.videoId));
+        const newItems = validItems.filter(v => !savedIds.has(v.videoId));
         await chrome.storage.local.set({ savedVideos: [...newItems, ...allVideos] });
         settingsModal.close();
         alert(`Imported ${newItems.length} new video${newItems.length === 1 ? '' : 's'}!`);
@@ -262,11 +270,17 @@ function bindControls() {
   document.getElementById('btn-open-selected').addEventListener('click', async () => {
     if (!selectedVideoIds.size) return;
     if (selectedVideoIds.size > 10 && !confirm(`This will open ${selectedVideoIds.size} tabs. Continue?`)) return;
-    allVideos.filter(v => selectedVideoIds.has(v.videoId)).forEach(v => chrome.tabs.create({ url: v.url, active: false }));
-    const newVideos = allVideos.filter(v => !selectedVideoIds.has(v.videoId));
+    const ids = new Set(selectedVideoIds);
+    const count = ids.size;
+    const removed = allVideos.filter(v => ids.has(v.videoId));
+    const newVideos = allVideos.filter(v => !ids.has(v.videoId));
+    removed.forEach(v => chrome.tabs.create({ url: v.url, active: false }));
     selectedVideoIds.clear();
     updateSelectionBar();
     await chrome.storage.local.set({ savedVideos: newVideos });
+    showUndoToast(`${count} video${count > 1 ? 's' : ''} opened & removed`, async () => {
+      await chrome.storage.local.set({ savedVideos: [...removed, ...newVideos] });
+    });
   });
 
   document.getElementById('btn-delete-selected').addEventListener('click', async () => {
@@ -329,7 +343,8 @@ function getProcessedVideos() {
       case 'dur-desc':  return (b.durationSeconds || 0) - (a.durationSeconds || 0);
       case 'chan-asc':  return (a.channelName || '').localeCompare(b.channelName || '');
       case 'chan-desc': return (b.channelName || '').localeCompare(a.channelName || '');
-      case 'title-asc': return (a.title || '').localeCompare(b.title || '');
+      case 'title-asc':  return (a.title || '').localeCompare(b.title || '');
+      case 'title-desc': return (b.title || '').localeCompare(a.title || '');
       default: return 0;
     }
   });
@@ -445,9 +460,11 @@ function createCard(video, index) {
 
 async function deleteSingleVideo(video, cardElement) {
   cardElement.classList.add('card-exit');
+  // Snapshot captured synchronously — before anything can mutate allVideos
+  // during the animation delay.
   const snapshot = [...allVideos];
+  const newVideos = snapshot.filter(v => v.videoId !== video.videoId);
   setTimeout(async () => {
-    const newVideos = allVideos.filter(v => v.videoId !== video.videoId);
     await chrome.storage.local.set({ savedVideos: newVideos });
   }, 300);
   showUndoToast(`"${video.title.substring(0, 40)}..." removed`, async () => {
