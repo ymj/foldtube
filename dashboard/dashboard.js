@@ -417,25 +417,66 @@ function createCard(video, index) {
   card.style.animationDelay = `${Math.min(index * 0.04, 0.4)}s`;
 
   const date = new Date(video.dateSaved).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-  const durHtml = video.durationFormatted ? `<span class="duration-badge">${escapeHtml(video.durationFormatted)}</span>` : '';
-  const checked = selectedVideoIds.has(video.videoId) ? 'checked' : '';
 
-  card.innerHTML = `
-    <input type="checkbox" class="card-checkbox" value="${video.videoId}" ${checked}>
-    <div class="thumbnail-container">
-      <img class="thumbnail" loading="lazy" src="${video.thumbnailUrl || ''}"
-        onerror="this.onerror=null;this.src='https://img.youtube.com/vi/${video.videoId}/hqdefault.jpg';"
-        alt="${escapeHtml(video.title)}"/>
-      ${durHtml}
-    </div>
-    <div class="card-content">
-      <h3 class="title" title="${escapeHtml(video.title)}">${escapeHtml(video.title)}</h3>
-      <a href="${video.channelUrl || '#'}" class="channel" target="_blank" rel="noopener noreferrer">${escapeHtml(video.channelName)}</a>
-      <div class="date-saved">Saved: ${date}</div>
-      <button class="delete-btn" title="Remove" aria-label="Remove">×</button>
-    </div>`;
+  // Checkbox
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.className = 'card-checkbox';
+  checkbox.value = video.videoId;
+  checkbox.checked = selectedVideoIds.has(video.videoId);
+  card.appendChild(checkbox);
 
-  const checkbox = card.querySelector('.card-checkbox');
+  // Thumbnail container
+  const thumbContainer = document.createElement('div');
+  thumbContainer.className = 'thumbnail-container';
+
+  const img = document.createElement('img');
+  img.className = 'thumbnail';
+  img.loading = 'lazy';
+  img.src = video.thumbnailUrl || '';
+  img.alt = video.title || '';
+  img.onerror = function() { this.onerror = null; this.src = `https://img.youtube.com/vi/${video.videoId}/hqdefault.jpg`; };
+  thumbContainer.appendChild(img);
+
+  if (video.durationFormatted) {
+    const durBadge = document.createElement('span');
+    durBadge.className = 'duration-badge';
+    durBadge.textContent = video.durationFormatted;
+    thumbContainer.appendChild(durBadge);
+  }
+  card.appendChild(thumbContainer);
+
+  // Card content
+  const cardContent = document.createElement('div');
+  cardContent.className = 'card-content';
+
+  const title = document.createElement('h3');
+  title.className = 'title';
+  title.title = video.title || '';
+  title.textContent = video.title || '';
+  cardContent.appendChild(title);
+
+  const channel = document.createElement('a');
+  channel.href = video.channelUrl || '#';
+  channel.className = 'channel';
+  channel.target = '_blank';
+  channel.rel = 'noopener noreferrer';
+  channel.textContent = video.channelName || '';
+  cardContent.appendChild(channel);
+
+  const dateSaved = document.createElement('div');
+  dateSaved.className = 'date-saved';
+  dateSaved.textContent = `Saved: ${date}`;
+  cardContent.appendChild(dateSaved);
+
+  const deleteBtn = document.createElement('button');
+  deleteBtn.className = 'delete-btn';
+  deleteBtn.title = 'Remove';
+  deleteBtn.setAttribute('aria-label', 'Remove');
+  deleteBtn.textContent = '\u00d7';
+  cardContent.appendChild(deleteBtn);
+
+  card.appendChild(cardContent);
 
   checkbox.addEventListener('change', (e) => {
     if (e.target.checked) { selectedVideoIds.add(video.videoId); card.classList.add('selected'); }

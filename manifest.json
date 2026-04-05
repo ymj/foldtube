@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "FoldTube - YouTube Tab Manager",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Collapse and manage your open YouTube tabs in a single dashboard.",
   "permissions": [
     "tabs",
@@ -36,5 +36,11 @@
   },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self';"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "foldtube@osumapps.com",
+      "strict_min_version": "128.0"
+    }
   }
 }

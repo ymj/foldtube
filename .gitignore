@@ -22,4 +22,10 @@ npm-debug.log*
 
 # Node (if any tooling is added later)
 node_modules/
+
+# Claude Code
 .claude/
+
+# Build output
+dist/
+build/

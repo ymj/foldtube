@@ -63,15 +63,37 @@ export function scrapeYouTubeTab() {
   let durationFormatted = '';
 
   if (!isShort) {
-    const durationEl = document.querySelector('span.ytp-time-duration');
-    durationFormatted = durationEl ? durationEl.textContent.trim() : '';
+    // Prefer the meta tag — it always reflects the real video duration,
+    // even when an ad is playing (the player UI shows the ad length instead).
+    const metaDuration = document.querySelector('meta[itemprop="duration"]');
+    if (metaDuration) {
+      const pt = metaDuration.getAttribute('content') || '';
+      const match = pt.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+      if (match) {
+        const h = parseInt(match[1] || 0, 10);
+        const m = parseInt(match[2] || 0, 10);
+        const s = parseInt(match[3] || 0, 10);
+        durationSeconds = (h * 3600) + (m * 60) + s;
 
-    if (durationFormatted) {
-      const parts = durationFormatted.split(':').map(Number);
-      if (parts.length === 3) {
-        durationSeconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
-      } else if (parts.length === 2) {
-        durationSeconds = parts[0] * 60 + parts[1];
+        const hStr = h > 0 ? `${h}:` : '';
+        const mStr = h > 0 ? m.toString().padStart(2, '0') : m.toString();
+        const sStr = s.toString().padStart(2, '0');
+        durationFormatted = `${hStr}${mStr}:${sStr}`;
+      }
+    }
+
+    // Fallback: read the player UI (may be wrong during ads, but better than nothing)
+    if (!durationSeconds) {
+      const durationEl = document.querySelector('span.ytp-time-duration');
+      durationFormatted = durationEl ? durationEl.textContent.trim() : '';
+
+      if (durationFormatted) {
+        const parts = durationFormatted.split(':').map(Number);
+        if (parts.length === 3) {
+          durationSeconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+        } else if (parts.length === 2) {
+          durationSeconds = parts[0] * 60 + parts[1];
+        }
       }
     }
   }

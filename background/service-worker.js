@@ -87,7 +87,50 @@ async function handleCollapse() {
             func: scrapeYouTubeTab,
           });
           const metadata = results[0]?.result;
-          if (metadata) newVideos.push(metadata);
+          if (metadata) {
+            // Get the real video duration from YouTube's main-world player API.
+            // The isolated-world scraper can't access it, and the player UI
+            // shows ad duration when an ad is playing.
+            try {
+              const durResults = await chrome.scripting.executeScript({
+                target: { tabId: tab.id },
+                world: 'MAIN',
+                func: () => {
+                  try {
+                    const player = document.querySelector('#movie_player');
+                    if (player && typeof player.getDuration === 'function') {
+                      // getVideoData gives us the real video duration even during ads
+                      const data = typeof player.getVideoData === 'function' ? player.getVideoData() : null;
+                      const lengthSec = data?.video_quality_features?.length_seconds
+                        || (typeof player.getDuration === 'function' ? player.getDuration() : 0);
+                      // getDuration() returns ad duration during ads, so also check ytInitialPlayerResponse
+                      if (typeof ytInitialPlayerResponse !== 'undefined') {
+                        const ls = parseInt(ytInitialPlayerResponse?.videoDetails?.lengthSeconds, 10);
+                        if (ls > 0) return ls;
+                      }
+                      return lengthSec || 0;
+                    }
+                    if (typeof ytInitialPlayerResponse !== 'undefined') {
+                      return parseInt(ytInitialPlayerResponse?.videoDetails?.lengthSeconds, 10) || 0;
+                    }
+                    return 0;
+                  } catch (_) { return 0; }
+                },
+              });
+              const realDuration = Math.round(durResults[0]?.result || 0);
+              if (realDuration > 0) {
+                metadata.durationSeconds = realDuration;
+                const h = Math.floor(realDuration / 3600);
+                const m = Math.floor((realDuration % 3600) / 60);
+                const s = realDuration % 60;
+                const hStr = h > 0 ? `${h}:` : '';
+                const mStr = h > 0 ? m.toString().padStart(2, '0') : m.toString();
+                const sStr = s.toString().padStart(2, '0');
+                metadata.durationFormatted = `${hStr}${mStr}:${sStr}`;
+              }
+            } catch (_) { /* duration enrichment is best-effort */ }
+            newVideos.push(metadata);
+          }
         }
         await chrome.tabs.remove(tab.id);
       } catch (e) {
@@ -102,35 +145,42 @@ async function handleCollapse() {
 
     await chrome.storage.local.set({ savedVideos: updatedVideos });
 
-    chrome.notifications.create({
-      type: "basic",
-      iconUrl: chrome.runtime.getURL("icons/icon128.png"),
-      title: "FoldTube",
-      message: `Folded ${tabs.length} YouTube tab${tabs.length === 1 ? '' : 's'}!`,
-      silent: true
-    });
+    try {
+      chrome.notifications.create("foldtube-collapse", {
+        type: "basic",
+        iconUrl: chrome.runtime.getURL("icons/icon128.png"),
+        title: "FoldTube",
+        message: `Folded ${tabs.length} YouTube tab${tabs.length === 1 ? '' : 's'}!`
+      });
+    } catch (_) { /* notification is non-critical */ }
 
     // Automatically try to enrich the missing discarded tabs
     runEnrichment();
 
   } else {
-    chrome.notifications.create({
-      type: "basic",
-      iconUrl: chrome.runtime.getURL("icons/icon128.png"),
-      title: "FoldTube",
-      message: "No YouTube tabs found.",
-      silent: true
-    });
+    try {
+      chrome.notifications.create("foldtube-empty", {
+        type: "basic",
+        iconUrl: chrome.runtime.getURL("icons/icon128.png"),
+        title: "FoldTube",
+        message: "No YouTube tabs found."
+      });
+    } catch (_) { /* notification is non-critical */ }
   }
 
-  const dashboardUrl = chrome.runtime.getURL("dashboard/dashboard.html");
-  const dashboardTabs = await chrome.tabs.query({ url: dashboardUrl });
-  if (dashboardTabs.length > 0) {
-    const existingTab = dashboardTabs[0];
-    await chrome.tabs.update(existingTab.id, { active: true });
-    await chrome.windows.update(existingTab.windowId, { focused: true });
-  } else {
-    await chrome.tabs.create({ url: dashboardUrl });
+  // Always open / focus the dashboard
+  try {
+    const dashboardUrl = chrome.runtime.getURL("dashboard/dashboard.html");
+    const dashboardTabs = await chrome.tabs.query({ url: dashboardUrl });
+    if (dashboardTabs.length > 0) {
+      const existingTab = dashboardTabs[0];
+      await chrome.tabs.update(existingTab.id, { active: true });
+      try { await chrome.windows.update(existingTab.windowId, { focused: true }); } catch (_) {}
+    } else {
+      await chrome.tabs.create({ url: dashboardUrl });
+    }
+  } catch (e) {
+    console.error("FoldTube: failed to open dashboard", e);
   }
 }
 
