@@ -23,15 +23,27 @@ FoldTube is a powerful YouTube tab manager that helps you take back control of y
 
 ## Installation
 
-### From the Chrome Web Store
-*(Link coming soon)*
+### Chrome / Brave / Edge
+**Chrome Web Store:** `https://chromewebstore.google.com/detail/phkhokoagdgofaaofmecfaibcnnahhoh?utm_source=item-share-cb`
+
+### Firefox
+**Mozilla Add-ons (AMO):** *Coming soon*
 
 ### Manual / Developer Install
+
+#### Chrome / Chromium-based browsers
 1. Download or clone this repository
 2. Open `chrome://extensions` (or `brave://extensions`) in your browser
 3. Enable **Developer mode** (toggle in the top right)
 4. Click **Load unpacked** and select the root of this repository
 5. Pin FoldTube to your toolbar and you're ready to go
+
+#### Firefox
+1. Download or clone this repository
+2. Run `./package.sh firefox` to build the Firefox package
+3. Open `about:debugging#/runtime/this-firefox`
+4. Click **Load Temporary Add-on** and select the generated zip from the `dist/` folder
+5. For permanent installation, install from the Mozilla Add-ons store (once published)
 
 ---
 
@@ -69,12 +81,27 @@ FoldTube collects **no user data**. Everything is stored locally on your device 
 
 ---
 
+## Building Packages
+
+FoldTube ships a single codebase that works on both Chrome and Firefox. The `package.sh` script produces browser-specific zip files ready for store submission:
+
+```bash
+./package.sh                # Build both Chrome and Firefox packages
+./package.sh chrome         # Chrome only
+./package.sh firefox        # Firefox only
+./package.sh --output DIR   # Custom output directory (default: ./dist)
+```
+
+The script transforms the manifest per browser — Chrome gets `background.service_worker`, Firefox gets `background.scripts` — so the source `manifest.json` stays Chrome-native for local development.
+
+---
+
 ## Tech Stack
 
-- **Manifest V3** Chrome Extension
+- **Manifest V3** extension — compatible with Chrome, Brave, Edge, and Firefox (128+)
 - Vanilla HTML / CSS / JavaScript — zero dependencies, zero frameworks
 - `chrome.storage.local` for persistence
-- `chrome.scripting` for DOM metadata extraction
+- `chrome.scripting` for DOM metadata extraction (with `world: 'MAIN'` for ad-safe duration capture)
 - `chrome.tabs` + `chrome.notifications` for tab management and user feedback
 
 ---
