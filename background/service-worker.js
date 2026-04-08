@@ -186,6 +186,31 @@ async function handleCollapse() {
 
 chrome.action.onClicked.addListener(handleCollapse);
 
+// ---- Open Dashboard (no collapse) ----
+
+async function handleOpenDashboard() {
+  try {
+    const dashboardUrl = chrome.runtime.getURL("dashboard/dashboard.html");
+    const dashboardTabs = await chrome.tabs.query({ url: dashboardUrl });
+    if (dashboardTabs.length > 0) {
+      const existingTab = dashboardTabs[0];
+      await chrome.tabs.update(existingTab.id, { active: true });
+      try { await chrome.windows.update(existingTab.windowId, { focused: true }); } catch (_) {}
+    } else {
+      await chrome.tabs.create({ url: dashboardUrl });
+    }
+  } catch (e) {
+    console.error("FoldTube: failed to open dashboard", e);
+  }
+}
+
+// Handle named keyboard commands
+chrome.commands.onCommand.addListener((command) => {
+  if (command === "open-dashboard") {
+    handleOpenDashboard();
+  }
+});
+
 // ---- Utility functions ----
 
 function urlToVideoData(urlStr, rawTitle) {
