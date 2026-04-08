@@ -1,14 +1,57 @@
+/* ════════════════════════════════════════
+   Theme Tokens
+   ════════════════════════════════════════ */
+
+/* Light — default baseline */
 :root {
+  --bg-color: #f5f5f5;
+  --surface-color: #ffffff;
+  --surface-hover: #e8e8e8;
+  --text-primary: #0f0f0f;
+  --text-secondary: #606060;
+  --border-color: #d9d9d9;
+  --skeleton-base: #e0e0e0;
+  --skeleton-shine: #ebebeb;
+  --accent-color: #ff0000;
+  --selection-color: #065fd4;
+
+  /* Non-theme tokens */
+  --border-radius: 8px;
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --transition-speed: 0.2s;
+}
+
+/* System dark — OS is dark and user hasn't picked an explicit theme */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-color: #0f0f0f;
+    --surface-color: #212121;
+    --surface-hover: #3d3d3d;
+    --text-primary: #f1f1f1;
+    --text-secondary: #aaaaaa;
+    --border-color: #333333;
+    --skeleton-base: #2a2a2a;
+    --skeleton-shine: #333333;
+    --selection-color: #3ea6ff;
+  }
+}
+
+/* Explicit dark — user chose "Dark" in settings */
+:root[data-theme="dark"] {
   --bg-color: #0f0f0f;
   --surface-color: #212121;
   --surface-hover: #3d3d3d;
   --text-primary: #f1f1f1;
   --text-secondary: #aaaaaa;
-  --accent-color: #ff0000;
-  --border-radius: 8px;
-  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --transition-speed: 0.2s;
+  --border-color: #333333;
+  --skeleton-base: #2a2a2a;
+  --skeleton-shine: #333333;
+  --selection-color: #3ea6ff;
 }
+
+/* ════════════════════════════════════════
+   Base
+   ════════════════════════════════════════ */
 
 body {
   margin: 0;
@@ -25,7 +68,7 @@ body {
   align-items: center;
   padding: 16px 24px;
   background-color: var(--surface-color);
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -58,14 +101,17 @@ body {
   align-items: center;
   gap: 16px;
 }
+
 .empty-state svg {
   opacity: 0.25;
 }
+
 .empty-state h2 {
   margin: 0;
   font-size: 1.3rem;
   color: var(--text-primary);
 }
+
 .empty-state p {
   margin: 0;
   font-size: 0.95rem;
@@ -74,6 +120,10 @@ body {
 .hidden {
   display: none !important;
 }
+
+/* ════════════════════════════════════════
+   Video Grid
+   ════════════════════════════════════════ */
 
 .video-grid {
   display: grid;
@@ -99,7 +149,10 @@ body {
   }
 }
 
-/* Video Card */
+/* ════════════════════════════════════════
+   Video Card
+   ════════════════════════════════════════ */
+
 .video-card {
   background-color: var(--surface-color);
   border-radius: var(--border-radius);
@@ -114,7 +167,7 @@ body {
 
 .video-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
   background-color: var(--surface-hover);
 }
 
@@ -183,7 +236,7 @@ body {
 
 .date-saved {
   font-size: 0.75rem;
-  color: #777;
+  color: var(--text-secondary);
 }
 
 .delete-btn {
@@ -192,7 +245,7 @@ body {
   right: 10px;
   background: none;
   border: none;
-  color: #888;
+  color: var(--text-secondary);
   font-size: 1.2rem;
   cursor: pointer;
   padding: 4px;
@@ -219,13 +272,16 @@ body {
   }
 }
 
-/* Sections */
+/* ════════════════════════════════════════
+   Sections
+   ════════════════════════════════════════ */
+
 .section-title {
   font-size: 1.25rem;
   font-weight: 600;
   margin: 32px 0 16px;
   color: var(--text-primary);
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 8px;
 }
 
@@ -233,7 +289,7 @@ body {
   display: none !important;
 }
 
-/* Shorts Grid specific */
+/* Shorts Grid */
 .shorts-grid {
   grid-template-columns: repeat(5, 1fr);
 }
@@ -260,7 +316,10 @@ body {
   }
 }
 
-/* Controls Bar */
+/* ════════════════════════════════════════
+   Controls Bar
+   ════════════════════════════════════════ */
+
 .controls-bar {
   display: flex;
   gap: 16px;
@@ -275,7 +334,7 @@ body {
 #sort-select {
   padding: 8px 12px;
   border-radius: var(--border-radius);
-  border: 1px solid #444;
+  border: 1px solid var(--border-color);
   background-color: var(--surface-color);
   color: var(--text-primary);
   font-family: inherit;
@@ -296,7 +355,7 @@ body {
 .filter-pill {
   padding: 6px 14px;
   border-radius: 16px;
-  border: 1px solid #444;
+  border: 1px solid var(--border-color);
   background-color: transparent;
   color: var(--text-primary);
   font-size: 0.85rem;
@@ -314,7 +373,10 @@ body {
   border-color: var(--text-primary);
 }
 
-/* Selection Bar */
+/* ════════════════════════════════════════
+   Selection Bar
+   ════════════════════════════════════════ */
+
 .selection-bar {
   position: sticky;
   top: 61px;
@@ -327,7 +389,7 @@ body {
   justify-content: space-between;
   align-items: center;
   z-index: 99;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .selection-actions {
@@ -336,21 +398,24 @@ body {
 }
 
 .selection-actions button {
-  background-color: #333;
-  border: 1px solid #444;
-  color: white;
+  background-color: var(--surface-hover);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
   padding: 6px 12px;
   border-radius: 4px;
   cursor: pointer;
   font-weight: 500;
-  transition: background-color var(--transition-speed);
+  transition: opacity var(--transition-speed);
 }
 
 .selection-actions button:hover {
-  background-color: rgba(255, 255, 255, 0.3);
+  opacity: 0.7;
 }
 
-/* Checkboxes */
+/* ════════════════════════════════════════
+   Checkboxes
+   ════════════════════════════════════════ */
+
 .card-checkbox {
   position: absolute;
   top: 10px;
@@ -360,7 +425,7 @@ body {
   z-index: 10;
   opacity: 0;
   cursor: pointer;
-  accent-color: #3ea6ff; /* YouTube dark-mode selection blue */
+  accent-color: var(--selection-color);
 }
 
 .video-card:hover .card-checkbox,
@@ -369,10 +434,13 @@ body {
 }
 
 .video-card.selected {
-  outline: 2px solid #3ea6ff;
+  outline: 2px solid var(--selection-color);
 }
 
-/* Settings Button */
+/* ════════════════════════════════════════
+   Settings Button
+   ════════════════════════════════════════ */
+
 .settings-btn {
   background: none;
   border: none;
@@ -382,12 +450,16 @@ body {
   filter: grayscale(1);
   transition: transform 0.2s, filter 0.2s;
 }
+
 .settings-btn:hover {
   transform: rotate(45deg);
   filter: grayscale(0);
 }
 
-/* Modal */
+/* ════════════════════════════════════════
+   Modal
+   ════════════════════════════════════════ */
+
 .modal {
   border: none;
   border-radius: var(--border-radius);
@@ -396,27 +468,32 @@ body {
   max-width: 600px;
   width: 90%;
   padding: 0;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
+
 .modal::backdrop {
-  background: rgba(0,0,0,0.7);
+  background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(4px);
 }
+
 .modal-content {
   display: flex;
   flex-direction: column;
 }
+
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 16px 24px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-color);
 }
+
 .modal-header h2 {
   margin: 0;
   font-size: 1.25rem;
 }
+
 .close-btn {
   background: none;
   border: none;
@@ -424,92 +501,176 @@ body {
   font-size: 1.5rem;
   cursor: pointer;
 }
+
 .close-btn:hover {
   color: var(--accent-color);
 }
+
 .modal-body {
   padding: 24px;
 }
+
 .setting-group {
   margin-bottom: 24px;
 }
+
 .setting-group h3 {
   margin-top: 0;
   margin-bottom: 12px;
   font-size: 1.05rem;
   color: var(--text-primary);
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 8px;
   font-weight: 500;
 }
+
 .setting-item label {
   font-weight: 600;
   display: block;
 }
-.setting-item p, .setting-group > p {
+
+.setting-item p,
+.setting-group>p {
   font-size: 0.85rem;
   color: var(--text-secondary);
   margin-top: 4px;
   margin-bottom: 12px;
   line-height: 1.4;
 }
+
 .setting-item input[type="password"] {
   width: 100%;
   padding: 8px 12px;
   background: var(--bg-color);
-  border: 1px solid #444;
-  color: white;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
   border-radius: 4px;
   margin-bottom: 8px;
   font-family: monospace;
   box-sizing: border-box;
 }
+
 .toggle-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .setting-text {
   flex: 1;
   padding-right: 16px;
 }
+
 .setting-actions {
   display: flex;
   gap: 12px;
+  flex-wrap: wrap;
 }
+
+.setting-actions .btn-secondary {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
 .btn-primary {
   background-color: var(--text-primary);
   color: var(--bg-color);
   border: none;
-  padding: 8px 16px;
+  padding: 6px 12px;
   border-radius: 4px;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 500;
   transition: opacity 0.2s;
 }
+
 .btn-secondary {
-  background-color: #444;
-  color: white;
-  border: none;
-  padding: 8px 16px;
+  background-color: var(--surface-hover);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 6px 12px;
   border-radius: 4px;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 500;
   transition: opacity 0.2s;
 }
-.btn-primary:hover, .btn-secondary:hover {
+
+.btn-primary:hover,
+.btn-secondary:hover {
   opacity: 0.8;
 }
 
-/* Toggle Switch */
-.switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
-.switch input { opacity: 0; width: 0; height: 0; }
-.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #444; transition: .2s; border-radius: 24px; }
-.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .2s; border-radius: 50%; }
-input:checked + .slider { background-color: var(--text-primary); }
-input:checked + .slider:before { transform: translateX(20px); background-color: var(--surface-color); }
+/* ════════════════════════════════════════
+   Theme Selector
+   ════════════════════════════════════════ */
 
-/* API Error Banner */
+.theme-select {
+  padding: 6px 10px;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  background-color: var(--surface-color);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ════════════════════════════════════════
+   Toggle Switch
+   ════════════════════════════════════════ */
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--surface-hover);
+  transition: .2s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .2s;
+  border-radius: 50%;
+}
+
+input:checked+.slider {
+  background-color: var(--text-primary);
+}
+
+input:checked+.slider:before {
+  transform: translateX(20px);
+  background-color: var(--surface-color);
+}
+
+/* ════════════════════════════════════════
+   API Error Banner
+   ════════════════════════════════════════ */
+
 .api-banner {
   background-color: #ffd700;
   color: #121212;
@@ -519,31 +680,43 @@ input:checked + .slider:before { transform: translateX(20px); background-color: 
   border-bottom: 1px solid #d4b200;
 }
 
-/* Skeleton Loading */
+/* ════════════════════════════════════════
+   Skeleton Loading
+   ════════════════════════════════════════ */
+
 @keyframes shimmer {
-  0% { background-position: -800px 0; }
-  100% { background-position: 800px 0; }
+  0% {
+    background-position: -800px 0;
+  }
+
+  100% {
+    background-position: 800px 0;
+  }
 }
+
 .skeleton-card {
   background-color: var(--surface-color);
   border-radius: var(--border-radius);
   overflow: hidden;
 }
+
 .skeleton-thumb {
   width: 100%;
   aspect-ratio: 16 / 9;
-  background: linear-gradient(90deg, #2a2a2a 25%, #333 50%, #2a2a2a 75%);
+  background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-shine) 50%, var(--skeleton-base) 75%);
   background-size: 800px 100%;
   animation: shimmer 1.4s infinite linear;
 }
+
 .skeleton-line {
   height: 14px;
   margin: 12px 12px 6px;
   border-radius: 4px;
-  background: linear-gradient(90deg, #2a2a2a 25%, #333 50%, #2a2a2a 75%);
+  background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-shine) 50%, var(--skeleton-base) 75%);
   background-size: 800px 100%;
   animation: shimmer 1.4s infinite linear;
 }
+
 .skeleton-line.short {
   width: 55%;
   height: 11px;
@@ -551,14 +724,17 @@ input:checked + .slider:before { transform: translateX(20px); background-color: 
   opacity: 0.6;
 }
 
-/* Undo Toast */
+/* ════════════════════════════════════════
+   Undo Toast
+   ════════════════════════════════════════ */
+
 #undo-toast {
   position: fixed;
   bottom: 32px;
   left: 50%;
   transform: translateX(-50%) translateY(20px);
   background-color: var(--surface-color);
-  border: 1px solid #444;
+  border: 1px solid var(--border-color);
   color: var(--text-primary);
   padding: 12px 20px;
   border-radius: 8px;
@@ -566,21 +742,23 @@ input:checked + .slider:before { transform: translateX(20px); background-color: 
   align-items: center;
   gap: 16px;
   font-size: 0.95rem;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   z-index: 9999;
   opacity: 0;
   transition: opacity 0.25s, transform 0.25s;
   pointer-events: none;
 }
+
 #undo-toast.visible {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
   pointer-events: all;
 }
+
 #undo-toast button {
   background: none;
-  border: 1px solid #555;
-  color: #3ea6ff;
+  border: 1px solid var(--border-color);
+  color: var(--selection-color);
   padding: 4px 12px;
   border-radius: 4px;
   cursor: pointer;
@@ -588,7 +766,7 @@ input:checked + .slider:before { transform: translateX(20px); background-color: 
   font-size: 0.9rem;
   transition: background 0.15s;
 }
+
 #undo-toast button:hover {
   background: rgba(62, 166, 255, 0.12);
 }
-
