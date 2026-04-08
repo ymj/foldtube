@@ -13,12 +13,14 @@ FoldTube is a powerful YouTube tab manager that helps you take back control of y
 - **One-click collapse** via the toolbar icon or `Ctrl+Shift+Y` (Windows/Linux) / `Cmd+Shift+Y` (Mac)
 - **Quick dashboard** without folding tabs via `Ctrl+Shift+U` (Windows/Linux) / `Cmd+Shift+U` (Mac)
 - **Organized dashboard** with separate sections for Videos and Shorts
+- **Light, Dark, and System theme** — follows your OS preference by default, or override it in Settings
 - **Real-time search**, multiple sorting options, and duration filter pills
 - **Bulk actions** — select, open, or remove multiple tabs at once
 - **Auto-collapse on browser exit** with smart duplicate detection on restore
 - **Metadata enrichment** via the YouTube Data API v3 (channel names, durations for sleeping tabs)
 - **Import / Export** your library as JSON or a shareable HTML bookmark page
 - **Instant Undo** for accidental deletions
+
 
 ---
 
@@ -74,6 +76,20 @@ To enable automatic backfilling:
 3. Paste your key and click **Save Key**
 
 FoldTube will automatically enrich any cards with missing data in the background. Your API key never leaves your device.
+
+---
+
+## Theme
+
+FoldTube supports three color themes, configurable under Settings (`⚙️`) → **Appearance**:
+
+| Mode | Behaviour |
+|---|---|
+| **System** (default) | Automatically matches your OS light/dark preference and updates in real time |
+| **Light** | Always uses the light theme, regardless of OS setting |
+| **Dark** | Always uses the dark theme, regardless of OS setting |
+
+Your preference is saved locally and applied immediately on every page load with no flash of unstyled content.
 
 ---
 
