@@ -4,6 +4,17 @@
 <head>
   <meta charset="UTF-8">
   <title>FoldTube - Youtube Tab Manager Dashboard</title>
+  <!-- Apply theme before first paint to prevent FOUC -->
+  <script>
+    (function () {
+      chrome.storage.local.get('settings', function (r) {
+        var t = r && r.settings && r.settings.theme;
+        if (t && t !== 'system') {
+          document.documentElement.setAttribute('data-theme', t);
+        }
+      });
+    })();
+  </script>
   <link rel="stylesheet" href="dashboard.css">
 </head>
 
@@ -20,8 +31,10 @@
   </header>
 
   <div id="api-error-banner" class="api-banner hidden">
-    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 1400px; margin: 0 auto;">
-      <span>⚠️ There seems to be an issue validating your YouTube API Key. Please check your settings and enter a valid one.</span>
+    <div
+      style="display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 1400px; margin: 0 auto;">
+      <span>⚠️ There seems to be an issue validating your YouTube API Key. Please check your settings and enter a valid
+        one.</span>
       <button id="btn-dismiss-banner" class="close-btn" style="font-size: 1.2rem; padding: 0;">&times;</button>
     </div>
   </div>
@@ -62,7 +75,7 @@
     <div id="empty-state" class="empty-state hidden">
       <p>No saved videos yet. Click the extension icon to collect your open YouTube tabs.</p>
     </div>
-    
+
     <div id="videos-section" class="section hidden">
       <h2 class="section-title">Videos</h2>
       <div id="video-grid" class="video-grid"></div>
@@ -81,7 +94,22 @@
         <button id="btn-close-settings" class="close-btn">&times;</button>
       </div>
       <div class="modal-body">
-        
+
+        <div class="setting-group">
+          <h3>Appearance</h3>
+          <div class="setting-item toggle-item">
+            <div class="setting-text">
+              <label for="theme-select">Color Theme</label>
+              <p>Choose how FoldTube looks. &ldquo;System&rdquo; follows your OS preference.</p>
+            </div>
+            <select id="theme-select" class="theme-select">
+              <option value="system">System</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+        </div>
+
         <div class="setting-group">
           <h3>General</h3>
           <div class="setting-item toggle-item">
@@ -100,7 +128,8 @@
           <h3>API & Enrichment</h3>
           <div class="setting-item">
             <label for="api-key-input">Enable Data Enrichment</label>
-            <p>Link a YouTube Data API v3 key to magically backfill missing channel names and correct video durations for sleeping/auto-collapsed tabs.</p>
+            <p>Link a YouTube Data API v3 key to magically backfill missing channel names and correct video durations
+              for sleeping/auto-collapsed tabs.</p>
             <input type="password" id="api-key-input" placeholder="Paste YouTube Data API Key here...">
             <div style="display: flex; gap: 8px;">
               <button id="btn-save-api" class="btn-primary">Save Key</button>

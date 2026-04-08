@@ -6,7 +6,8 @@ let currentDurationFilter = null;
 
 let appSettings = {
   autoCollapse: false,
-  apiKey: ''
+  apiKey: '',
+  theme: 'system' // 'system' | 'light' | 'dark'
 };
 
 // Undo state
@@ -26,13 +27,33 @@ function debounce(fn, delay) {
   };
 }
 
+// ---- Theme ----
+
+/**
+ * Applies the given theme preference to the document root.
+ * - 'system': removes data-theme, letting the CSS @media query decide.
+ * - 'light' / 'dark': sets data-theme so the explicit token block wins.
+ */
+function applyTheme(preference) {
+  const root = document.documentElement;
+  if (preference === 'system') {
+    root.removeAttribute('data-theme');
+  } else {
+    root.setAttribute('data-theme', preference);
+  }
+}
+
 // ---- Settings ----
 async function loadSettings() {
-  const { settings } = await chrome.storage.local.get("settings");
+  const { settings } = await chrome.storage.local.get('settings');
   if (settings) appSettings = { ...appSettings, ...settings };
   document.getElementById('auto-collapse-toggle').checked = appSettings.autoCollapse;
   document.getElementById('api-key-input').value = appSettings.apiKey;
   document.getElementById('btn-clear-api').classList.toggle('hidden', !appSettings.apiKey);
+
+  // Apply persisted theme and sync the selector
+  applyTheme(appSettings.theme);
+  document.getElementById('theme-select').value = appSettings.theme;
 }
 
 async function saveSettings() {
@@ -46,6 +67,11 @@ async function init() {
   bindControls();
   showSkeletons();
   await loadVideos();
+
+  // Re-apply theme if OS preference changes while user is in 'system' mode
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (appSettings.theme === 'system') applyTheme('system');
+  });
 
   chrome.storage.local.get("apiError").then(({ apiError }) => {
     if (apiError) document.getElementById('api-error-banner').classList.remove('hidden');
@@ -135,6 +161,12 @@ function bindControls() {
   // Settings
   document.getElementById('auto-collapse-toggle').addEventListener('change', async (e) => {
     appSettings.autoCollapse = e.target.checked;
+    await saveSettings();
+  });
+
+  document.getElementById('theme-select').addEventListener('change', async (e) => {
+    appSettings.theme = e.target.value;
+    applyTheme(appSettings.theme);
     await saveSettings();
   });
 
