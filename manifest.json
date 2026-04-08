@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "FoldTube - YouTube Tab Manager",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Collapse and manage your open YouTube tabs in a single dashboard.",
   "permissions": [
     "tabs",
@@ -39,6 +39,13 @@
         "mac": "Command+Shift+U"
       },
       "description": "Open FoldTube dashboard without folding tabs"
+    },
+    "fold-current-tab": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+E",
+        "mac": "Command+Shift+E"
+      },
+      "description": "Fold current YouTube tab"
     }
   },
   "content_security_policy": {

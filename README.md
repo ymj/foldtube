@@ -11,6 +11,7 @@ FoldTube is a powerful YouTube tab manager that helps you take back control of y
 ## Features
 
 - **One-click collapse** via the toolbar icon or `Ctrl+Shift+Y` (Windows/Linux) / `Cmd+Shift+Y` (Mac)
+- **Single-tab collapse** via `Ctrl+Shift+E` (Windows/Linux) / `Cmd+Shift+E` (Mac)
 - **Quick dashboard** without folding tabs via `Ctrl+Shift+U` (Windows/Linux) / `Cmd+Shift+U` (Mac)
 - **Organized dashboard** with separate sections for Videos and Shorts
 - **Light, Dark, and System theme** — follows your OS preference by default, or override it in Settings
@@ -55,6 +56,7 @@ FoldTube is a powerful YouTube tab manager that helps you take back control of y
 | Action | How |
 |---|---|
 | Collapse all YouTube tabs | Click the FoldTube toolbar icon, or press `Ctrl+Shift+Y` (Windows/Linux) / `Cmd+Shift+Y` (Mac) |
+| Collapse current YouTube tab | Press `Ctrl+Shift+E` (Windows/Linux) / `Cmd+Shift+E` (Mac) |
 | Open dashboard (no fold) | Press `Ctrl+Shift+U` (Windows/Linux) / `Cmd+Shift+U` (Mac) |
 | Open a saved video | Click any card on the dashboard |
 | Delete a card | Click the `×` button on the card |
