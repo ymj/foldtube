@@ -5,16 +5,7 @@
   <meta charset="UTF-8">
   <title>FoldTube - Youtube Tab Manager Dashboard</title>
   <!-- Apply theme before first paint to prevent FOUC -->
-  <script>
-    (function () {
-      chrome.storage.local.get('settings', function (r) {
-        var t = r && r.settings && r.settings.theme;
-        if (t && t !== 'system') {
-          document.documentElement.setAttribute('data-theme', t);
-        }
-      });
-    })();
-  </script>
+  <script src="theme-init.js"></script>
   <link rel="stylesheet" href="dashboard.css">
 </head>
 
